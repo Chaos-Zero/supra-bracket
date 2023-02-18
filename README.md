@@ -13,6 +13,8 @@ This project includes a Node.js server script and a web page that connects to it
 
 ← `public/main.js`: The place where the bot setup methods are located. Create, adding commands and registering commands are found here.
 
+← `public/imports.js`: A hack attempt at reducing the ammount of importing methods from other files is required around the code. Just do it all, thnx. 
+
 ← `public/commands`: Contains the slash commands module exports, each in it's owm file so they can be automatically added to the bot registing list. 
 
 ← `public/events`: This is for capturing specific events from interations on the server. Works the same way as the command directory and more future proofing at the moment. 
