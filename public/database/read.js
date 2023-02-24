@@ -55,9 +55,9 @@ async function GetNextTournamentRound(db, tournamentName, numberOfTracks) {
       battle: entry.battle,
       points: entry.points,
       hasTakenPlace: entry.hasTakenPlace,
-      users1: entry.users1,
-      users2: entry.users2,
-      users3: entry.users3,
+      users1: entry.usersFirstPick,
+      users2: entry.usersSecondPick,
+      users3: entry.usersDidNotPlace,
     });
   });
   

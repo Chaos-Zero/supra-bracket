@@ -84,6 +84,7 @@ async function CalculateReactionPoints(reactionDetails) {
   var entry1Tally = 0,
     entry2Tally = 0,
     entry3Tally = 0;
+  var votedAFirst, votedASecond, didNotVoteA, votedBFirst, votedBSecond, didNotVoteB, votedCFirst, votedCSecond, didNotVoteC = []
   
   //console.log("Length: " + reactionDetails);
   for (var i = 0; i < reactionDetails.length; i++) {
@@ -91,31 +92,54 @@ async function CalculateReactionPoints(reactionDetails) {
       case "1️⃣":
         entry1Tally += ((parseInt(reactionDetails[i].emojiCount) - 1) * 2);
         entry2Tally += parseInt(reactionDetails[i].emojiCount) - 1;
+        votedAFirst.push(reactionDetails[i].users);
+        votedBSecond.push(reactionDetails[i].users);
+        didNotVoteC.push(reactionDetails[i].users);
         break;
       case "2️⃣":
         entry1Tally += ((parseInt(reactionDetails[i].emojiCount) - 1) * 2);
         entry3Tally += parseInt(reactionDetails[i].emojiCount) - 1;
+        votedAFirst.push(reactionDetails[i].users);
+        votedCSecond.push(reactionDetails[i].users);
+        didNotVoteB.push(reactionDetails[i].users);
         break;
       case "3️⃣":
         entry2Tally += ((parseInt(reactionDetails[i].emojiCount) - 1) * 2);
         entry1Tally += parseInt(reactionDetails[i].emojiCount) - 1;
+        votedBFirst.push(reactionDetails[i].users);
+        votedASecond.push(reactionDetails[i].users);
+        didNotVoteC.push(reactionDetails[i].users);
         break;
       case "4️⃣":
         entry2Tally += ((parseInt(reactionDetails[i].emojiCount) - 1) * 2);
         entry3Tally += parseInt(reactionDetails[i].emojiCount) - 1;
+        votedBFirst.push(reactionDetails[i].users);
+        votedCSecond.push(reactionDetails[i].users);
+        didNotVoteA.push(reactionDetails[i].users);
         break;
       case "5️⃣":
         entry3Tally += ((parseInt(reactionDetails[i].emojiCount) - 1) * 2);
         entry1Tally += parseInt(reactionDetails[i].emojiCount) - 1;
+        votedCFirst.push(reactionDetails[i].users);
+        votedASecond.push(reactionDetails[i].users);
+        didNotVoteB.push(reactionDetails[i].users);
         break;
       case "6️⃣":
         entry3Tally += ((parseInt(reactionDetails[i].emojiCount) - 1) * 2);
         entry2Tally += parseInt(reactionDetails[i].emojiCount) - 1;
+        votedCFirst.push(reactionDetails[i].users);
+        votedBSecond.push(reactionDetails[i].users);
+        didNotVoteA.push(reactionDetails[i].users);
         break;
     }
   }
+  var votesForA = {first: votedAFirst, second: votedASecond, last: didNotVoteA};
+  var votesForB = {first: votedBFirst, second: votedBSecond, last: didNotVoteB};
+  var votesForC = {first: votedCFirst, second: votedCSecond, last: didNotVoteC};
+  var votesPerGame ={ 0:votesForA, 1:votesForB, 2:votesForC }  
+  
   console.log("Tallys: " + entry1Tally + " " + entry2Tally + " " + entry3Tally);
-  return { 0: entry1Tally, 1: entry2Tally, 2: entry3Tally };
+  return [{ 0: entry1Tally, 1: entry2Tally, 2: entry3Tally }, votesPerGame];
 }
 
 //async function GetReactionResults(message) {

@@ -23,7 +23,7 @@ async function SendDailyEmbed(
     return Object.keys(object).filter((key) => object[key] == max);
   };
 
-  var previousWinner = getMax(previousDaysPoints);
+  var previousWinner = getMax(previousDaysPoints[0]);
   console.log("Previous winner number " + previousWinner);
   console.log(
     "Our Previous Winner: " +
@@ -169,12 +169,12 @@ async function SendDailyEmbed(
     embedMessage.react("6️⃣");
   });
     
-   //dbUpdates = {isCompleted: true, points: 0, users1: [], users2: [], users3: []  } .
       
-   // for (var i = 0; i < previousDaysPoints.length; i++){
-    //  updateParams = { isCompleted: true, points: previousDaysPoints[i]}
-    //  UpdateBattleResults(GetDb, table, tournamentRoundDetails[2], tournamentRoundDetails[1][i].name, updateParams)
-     //   }
+    for (var i = 0; i < previousDaysPoints[0].length; i++){
+
+      var updateParams = {name: tournamentRoundDetails[1][i].name, link:tournamentRoundDetails[1][i].link , battle: tournamentRoundDetails[1][i].battle , points: previousDaysPoints[0].i, hasTakenPlace: true, usersFirstPick: previousDaysPoints[1].i.first, usersSecondPick: previousDaysPoints[1].i.second, usersDidNotPlace: previousDaysPoints[1].i.last}
+      UpdateBattleResults(GetDb, table, tournamentRoundDetails[2], updateParams)
+      }
 }
 
 //var buttonEmbed = new EmbedBuilder()
