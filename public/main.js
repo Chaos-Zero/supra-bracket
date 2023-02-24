@@ -11,9 +11,9 @@ const {
   Routes,
 } = require("discord.js");
 
-const { clientId, guildId, token } = require("./public/commands-config.json");
 const Discord = require("discord.js");
 const fs = require("fs");
+const schedule = require("node-cron");
 eval(fs.readFileSync("./public/imports.js") + "");
 
 const nodefs = require("node:fs");
@@ -23,6 +23,7 @@ var low = require("lowdb");
 var FileSync = require("lowdb/adapters/FileSync");
 var adapter = new FileSync(".data/db.json");
 var db = low(adapter);
+var botAccess;
 
 DbDefaultSetup(db);
 
@@ -65,7 +66,12 @@ function CreateBot() {
     });
     console.log("This bot is active!");
   });
+  botAccess = bot;
   return bot;
+}
+
+function GetBot() {
+  return botAccess;
 }
 
 function SetupEvents(bot) {
@@ -130,9 +136,12 @@ async function DeployCommands() {
       );
 
       // The put method is used to fully refresh all commands in the guild with the current set
-      const data = await rest.put(Routes.applicationCommands(clientId), {
-        body: commands,
-      });
+      const data = await rest.put(
+        Routes.applicationCommands("1075910273044590713"),
+        {
+          body: commands,
+        }
+      );
 
       console.log(
         `Successfully reloaded ${data.length} application (/) commands.`
@@ -143,3 +152,7 @@ async function DeployCommands() {
     }
   })();
 }
+
+//schedule.schedule("*/15 * * * *", function () {
+//  console.log("Posting every 15 seconds");
+//});

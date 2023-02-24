@@ -5,7 +5,8 @@
 // but feel free to use whatever libraries or frameworks you'd like through `package.json`.
 const express = require("express");
 const fs = require("fs");
-const { Events } = require('discord.js');
+const { Events } = require("discord.js");
+const cron = require("node-cron");
 
 eval(fs.readFileSync("./public/main.js") + "");
 
@@ -42,3 +43,18 @@ const listener = app.listen(process.env.PORT, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
 
+//var task = cron.schedule(
+//  "* * * * *",
+//  function () {
+//    console.log("Posting every 15 seconds");
+//  },
+//  {
+//    scheduled: false,
+//  }
+//);
+
+//task.start();
+
+function GetBot() {
+  return bot;
+}
