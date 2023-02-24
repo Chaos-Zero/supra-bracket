@@ -16,7 +16,11 @@
     "express-session": "^1.17.3",
     "handlebars": "^4.7.7",
     "brackets-json-db": "1.0.2",
-    "brackets-memory-db": "1.0.4"
+    "brackets-memory-db": "1.0.4",
+    "node-cron": "^3.0.2",
+    "gif-encoder-2": "^1.0.5",
+    "get-pixels": "^3.3.3",
+    "canvas": "^2.11.0"
   },
   "engines": {
     "node": "16.x"
