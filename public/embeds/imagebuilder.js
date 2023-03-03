@@ -9,7 +9,9 @@ async function GetYtThumb(urls) {
       ytVideoId = ytVideoId.substring(n + 1);
     }
 
-    let thumb = "https://i1.ytimg.com/vi/" + ytVideoId + "/hq3.jpg";
+    //let thumb = "https://i1.ytimg.com/vi/" + ytVideoId + "/maxresdefault.jpg";
+    let thumb = "https://i1.ytimg.com/vi/" + ytVideoId + "/maxres2.jpg";
+    
     formattedUrls.push(thumb)
   });
   //Example of usage:

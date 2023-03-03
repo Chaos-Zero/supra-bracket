@@ -13,15 +13,17 @@ const {
 
 const Discord = require("discord.js");
 const fs = require("fs");
-const schedule = require("node-cron");
+const cron = require("cron");
 eval(fs.readFileSync("./public/imports.js") + "");
+eval(fs.readFileSync("./public/embeds/dailymessages.js") + "");
+eval(fs.readFileSync("./public/utils/messageutils.js") + "");
 
 const nodefs = require("node:fs");
 const path = require("node:path");
 
-var low = require("lowdb");
 var FileSync = require("lowdb/adapters/FileSync");
 var adapter = new FileSync(".data/db.json");
+var low = require("lowdb");
 var db = low(adapter);
 var botAccess;
 
@@ -49,9 +51,23 @@ function CreateBot() {
   //  'NON_PRIVILEGED', // include all non-privileged intents, would be better to specify which ones you actually need
   //  'GUILD_MEMBERS', // lets you request guild members (i.e. fixes the issue)
   //]);
+  let sendDailyEmbed = new cron.CronJob(
+    "40 18 17 * * 1-5",
+    CreateAndSendDailyBattleMessages
+  ); // fires Mon - Thurs, at 18:00:10 (1:00 PM EST)
+  //let sendFridayEmbed = new cron.CronJob('15 * 18 * * 5', test); // fires from Monday to Friday, every hour from 8 am to 16
+  let checkTournamentBattleReactions = new cron.CronJob(
+    "00 15 * * * *",
+    SendMessageForDuplicateVotes
+  );
+  let checkTournamentBattleReactions2 = new cron.CronJob(
+    "00 45 * * * *",
+    SendMessageForDuplicateVotes
+  );
+
   const bot = new Discord.Client({
     intents: intents,
-    partials: [Partials.Channel],
+    partials: [Partials.Message, Partials.Channel, Partials.Reaction],
   });
   bot.setMaxListeners(0);
 
@@ -65,8 +81,12 @@ function CreateBot() {
       status: "Downloading ALL THE INTERNET!",
     });
     console.log("This bot is active!");
+    // Set check chron here
   });
   botAccess = bot;
+  sendDailyEmbed.start();
+  //checkTournamentBattleReactions.start();
+  //checkTournamentBattleReactions2.start();
   return bot;
 }
 
