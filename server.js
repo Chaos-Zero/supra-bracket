@@ -6,9 +6,10 @@
 const express = require("express");
 const fs = require("fs");
 const { Events } = require("discord.js");
-const cron = require("node-cron");
+const cron = require("cron");
 
 eval(fs.readFileSync("./public/main.js") + "");
+eval(fs.readFileSync("./public/utils/messageutils.js") + "");
 
 const app = express();
 
@@ -24,10 +25,36 @@ DeployCommands();
 var count = 10;
 
 // Deal with Discord Messages
-bot.on("messageCreate", (message) => {
+bot.on("messageCreate", async (message) => {
   //console.log(message)
   let thisChannel = message.channel;
 });
+
+//bot.on("messageReactionAdd", async (reaction, user) => {
+//  if (reaction.partial) {
+//    // If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+//    try {
+//      await reaction.fetch().then((reaction) => {
+//        let thisChannel = reaction.message.channel;
+//        if (
+//          user.id !== bot.user.id &&
+//          thisChannel.name == process.env.TOURNAMENT_NAME
+//        ) {
+//          CheckReactions(reaction, user);
+//        }
+//      });
+//    } catch (error) {
+//      console.error("Something went wrong when fetching the message:", error);
+//      // Return as `reaction.message.author` may be undefined/null
+//      return;
+//    }
+//  } else {
+//    let thisChannel = reaction.message.channel;
+//    if (user.id !== bot.user.id && thisChannel.name == process.env.TOURNAMENT_NAME) {
+//      CheckReactions(reaction, user);
+//    }
+//  }
+//});
 
 // make all the files in 'public' available
 // https://expressjs.com/en/starter/static-files.html
@@ -55,6 +82,7 @@ const listener = app.listen(process.env.PORT, () => {
 
 //task.start();
 
-function GetBot() {
-  return bot;
-}
+//There's probably a better way to distrubute the client details, but laziness has won here.
+//function GetBot() {
+//  return bot;
+//}
