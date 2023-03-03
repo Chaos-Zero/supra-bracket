@@ -84,7 +84,7 @@ async function SendDailyEmbed(
     },
   ];
 
-  console.log(
+console.log(
     "Points out of order" +
       entries[0].points +
       " " +
