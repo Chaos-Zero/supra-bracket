@@ -186,7 +186,7 @@ async function GetCurrentRound(db, tournamentName) {
   return currentRound;
 }
 
-
+// Not use in production. 
 async function wasLastBattleTie(db, tournamentName, currentRound)
 {
   return db

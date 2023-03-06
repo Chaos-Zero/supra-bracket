@@ -13,6 +13,6 @@ module.exports = {
     var channelMessage = await interaction.reply("Constructing Embed");
     console.log("AY");
     // Future proofing the method but just hard coding the value for now
-    CreateAndSendDailyBattleMessages(interaction);
+    CreateAndSendDailyBattleMessages(getDb(), interaction);
   },
 };

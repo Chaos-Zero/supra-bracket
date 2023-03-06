@@ -15,8 +15,6 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const cron = require("cron");
 eval(fs.readFileSync("./public/imports.js") + "");
-eval(fs.readFileSync("./public/embeds/dailymessages.js") + "");
-eval(fs.readFileSync("./public/utils/messageutils.js") + "");
 
 const nodefs = require("node:fs");
 const path = require("node:path");
@@ -47,22 +45,18 @@ function CreateBot() {
     GatewayIntentBits.GuildEmojisAndStickers,
   ];
 
-  //new Intents([
-  //  'NON_PRIVILEGED', // include all non-privileged intents, would be better to specify which ones you actually need
-  //  'GUILD_MEMBERS', // lets you request guild members (i.e. fixes the issue)
-  //]);
   let sendDailyEmbed = new cron.CronJob(
-    "40 18 17 * * 1-5",
-    CreateAndSendDailyBattleMessages
+    "40 18 17 * * 1-5", () => 
+    CreateAndSendDailyBattleMessages(bot, db)
   ); // fires Mon - Thurs, at 18:00:10 (1:00 PM EST)
   //let sendFridayEmbed = new cron.CronJob('15 * 18 * * 5', test); // fires from Monday to Friday, every hour from 8 am to 16
   let checkTournamentBattleReactions = new cron.CronJob(
-    "00 15 * * * *",
-    SendMessageForDuplicateVotes
+    "00 15 * * * *", () =>
+    SendMessageForDuplicateVotes(bot, db)
   );
   let checkTournamentBattleReactions2 = new cron.CronJob(
     "00 45 * * * *",
-    SendMessageForDuplicateVotes
+    SendMessageForDuplicateVotes(bot, db)
   );
 
   const bot = new Discord.Client({
@@ -172,7 +166,3 @@ async function DeployCommands() {
     }
   })();
 }
-
-//schedule.schedule("*/15 * * * *", function () {
-//  console.log("Posting every 15 seconds");
-//});
