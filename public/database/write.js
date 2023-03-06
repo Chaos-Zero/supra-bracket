@@ -65,3 +65,48 @@ async function UpdateRoundCompleted(db, table, round) {
     .assign(true)
     .write();
 }
+
+
+async function UpdateDbWithBattleResults(
+  db,
+  tournamentTableName,
+  tournamentRoundDetails,
+  previousDaysPoints
+) {
+  var updates = [];
+  console.log(
+    "How many values we're inserting: " + tournamentRoundDetails[0].length
+  );
+  console.log("Who vote for A as first? " + previousDaysPoints[1][0].first);
+  for (var i = 0; i < tournamentRoundDetails[0].length; i++) {
+    var updateParams = {
+      name: tournamentRoundDetails[1][i].name,
+      link: tournamentRoundDetails[1][i].link,
+      battle: tournamentRoundDetails[1][i].battle,
+      points: Object.values(previousDaysPoints[0])[i],
+      hasTakenPlace: true,
+      usersFirstPick: previousDaysPoints[1][i].first,
+      usersSecondPick: previousDaysPoints[1][i].second,
+      usersDidNotPlace: previousDaysPoints[1][i].last,
+    };
+    updates.push(updateParams);
+  }
+  console.log(updates);
+  UpdateBattleResults(
+    db,
+    tournamentTableName,
+    tournamentRoundDetails[2],
+    updates
+  );
+  UpdateAlertedUsers(db, tournamentTableName, tournamentRoundDetails[2]);
+}
+
+async function AddWinnerToNextRound(db, table, round, assignment) {
+  var roundToUpdate = parseInt(round)
+ 
+  let dbNextRoundentry = db
+    .get(table)
+    .find({ round: (roundToUpdate + 1) })
+    .push(assignment)
+    .write();
+}

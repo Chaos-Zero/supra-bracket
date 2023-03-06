@@ -13,9 +13,6 @@ eval(readFileSync("./public/embeds/imagebuilder.js") + "");
 
 var Stream = require("stream").Transform;
 const path = require("path");
-var request = require("request"),
-  http = require("http"),
-  https = require("https");
 
 const readdirAsync = promisify(readdir);
 let imagesFolder = "/app/public/commands/gif/input";
@@ -88,66 +85,6 @@ function createGif(algorithm, interaction, gifName) {
     });
   });
 }
-
-async function downloadImages(urls, singleImage = false) {
-  return new Promise(async (resolve) => {
-    youtubeImages = await GetYtThumb(urls);
-    //  "https://youtu.be/49mVLN8OJSo",
-    //  "https://youtu.be/uRbDCEJ23WI",
-    //  "https://youtu.be/-AOW64B2bnY",
-    //]);
-
-    let inputPath = "/app/public/commands/gif/input/";
-    console.log(inputPath);
-
-    if (!singleImage) {
-      readdirAsync(inputPath, (err, files) => {
-        if (err) throw err;
-
-        for (const file of files) {
-          unlink(path.join(inputPath, file), (err) => {
-            if (err) throw err;
-          });
-        }
-      });
-    }
-
-    var index = 0;
-    if (singleImage !== false) {
-      index = singleImage;
-    }
-    youtubeImages.forEach(function (image) {
-      //console.log("HERE: " + image);
-      downloadImage(image, inputPath + index + ".jpg");
-      index += 1;
-    });
-
-    resolve();
-  });
-}
-
-async function downloadImage(uri, filename, callback) {
-  var client = http;
-  if (uri.toString().indexOf("https") === 0) {
-    client = https;
-  }
-
-  client
-    .request(uri, function (response) {
-      var data = new Stream();
-
-      response.on("data", function (chunk) {
-        data.push(chunk);
-      });
-
-      response.on("end", function () {
-        writeFileSync(filename, data.read());
-      });
-    })
-    .end();
-  console.log("File downloaded");
-}
-
 //createGif('neuquant')
 
 //var encoder = new GIFEncoder();

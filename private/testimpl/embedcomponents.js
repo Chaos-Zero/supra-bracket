@@ -109,3 +109,30 @@
     //      },
     //    ])
     //);
+
+
+//    if (isATie) {
+//      prevEmbed
+//        .setAuthor({
+//          name: "Previous Battle Update",
+//          iconURL:
+//            "https://cdn.glitch.global/485febab-53bf-46f2-9ec1-a3c597dfaebe/SD%20Logo.png?v=1676855711752",
+//        })
+//        .setTitle(
+//          ":warning: The previous battle has resulted in a draw! :warning:"
+//        )
+//        .setDescription(
+//          "Please reconsider your votes for our previous round if you have voted for third place.\n" +
+//            "The two songs in contention are:\n" +
+//            sortedEntries[0].name +
+//            " with " +
+//            sortedEntries[0].points +
+//            " points\nand\n" +
+//            sortedEntries[1].name +
+//            " with " +
+//            sortedEntries[1].points +
+//            " points." +
+//            "\nThe Previous round has had a further 24 hours added. Thank you for your cooperation.\n" +
+//            "-The SupraDarky Team"
+//        );
+//    } else {

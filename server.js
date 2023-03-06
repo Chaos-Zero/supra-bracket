@@ -69,20 +69,3 @@ app.get("/", (request, response) => {
 const listener = app.listen(process.env.PORT, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
-
-//var task = cron.schedule(
-//  "* * * * *",
-//  function () {
-//    console.log("Posting every 15 seconds");
-//  },
-//  {
-//    scheduled: false,
-//  }
-//);
-
-//task.start();
-
-//There's probably a better way to distrubute the client details, but laziness has won here.
-//function GetBot() {
-//  return bot;
-//}
