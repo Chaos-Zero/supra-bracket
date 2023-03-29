@@ -1,9 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 eval(fs.readFileSync("./public/utils/messageutils.js") + "");
-eval(fs.readFileSync("./public/embeds/dailymessages.js") + "");
-//eval(fs.readFileSync("./public/embeds/dailymessages.js") + "");
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("reactions")
@@ -27,10 +24,10 @@ module.exports = {
           "The Previous round has had a further 24 hours added. Thank you for your cooperation.\n" +
           "-The SupraDarky Team"
       )
-    .setColor("0xff0000")
+      .setColor("0xff0000");
 
-    var timeForRound = GetTimeInEpochStamp(24)
-    
+    var timeForRound = GetTimeInEpochStamp(24);
+
     var channel = await GetChannelByName(
       interaction.member.guild,
       process.env.TOURNAMENT_CHANNEL
@@ -38,8 +35,8 @@ module.exports = {
 
     channel.messages.fetch(`1080902116350103552`).then((message) => {
       console.log(message.embeds);
-      console.log(message.embeds[1].fields)
-      message.embeds[0] = prevEmbed
+      console.log(message.embeds[1].fields);
+      message.embeds[0] = prevEmbed;
       message.edit({ embeds: message.embeds });
     });
 

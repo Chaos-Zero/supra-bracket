@@ -15,6 +15,7 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const cron = require("cron");
 eval(fs.readFileSync("./public/imports.js") + "");
+eval(fs.readFileSync("./public/database/csv/csvfileutils.js") + "");
 
 const nodefs = require("node:fs");
 const path = require("node:path");
@@ -26,12 +27,27 @@ var db = low(adapter);
 var botAccess;
 
 DbDefaultSetup(db);
-
 function GetDb() {
   return db;
 }
 
+let populatedDb = GetDbTable(db, process.env.TOURNAMENT_NAME);
+
+function refreshDb() {
+  //db.read()
+  console.log("Db's reloaded")
+}
+
+// If we want to pass this around, it needs to be in an object to pass the value by refernce, otherwise, it's just copied
+global.userAlbumResults = new Map();
+
+function GetLocalDb() {
+  return populatedDb;
+}
+
 function CreateBot() {
+  //LoadCsv();
+
   const intents = [
     //'NON_PRIVILEGED', // include all non-privileged intents, would be better to specify which ones you actually need
     GatewayIntentBits.Guilds,
@@ -44,20 +60,6 @@ function CreateBot() {
     GatewayIntentBits.GuildPresences,
     GatewayIntentBits.GuildEmojisAndStickers,
   ];
-
-  let sendDailyEmbed = new cron.CronJob(
-    "40 18 17 * * 1-5", () => 
-    CreateAndSendDailyBattleMessages(bot, db)
-  ); // fires Mon - Thurs, at 18:00:10 (1:00 PM EST)
-  //let sendFridayEmbed = new cron.CronJob('15 * 18 * * 5', test); // fires from Monday to Friday, every hour from 8 am to 16
-  let checkTournamentBattleReactions = new cron.CronJob(
-    "00 15 * * * *", () =>
-    SendMessageForDuplicateVotes(bot, db)
-  );
-  let checkTournamentBattleReactions2 = new cron.CronJob(
-    "00 45 * * * *",
-    SendMessageForDuplicateVotes(bot, db)
-  );
 
   const bot = new Discord.Client({
     intents: intents,
@@ -87,6 +89,23 @@ function CreateBot() {
 function GetBot() {
   return botAccess;
 }
+
+let sendDailyEmbed = new cron.CronJob("34 17 16 * * *", () => {
+  //"25 32 00 * * 1-6"
+  console.log("Sending Daily Message");
+    db.read();
+  populatedDb = GetDbTable(db, process.env.TOURNAMENT_NAME);
+  CreateAndSendDailyBattleMessages(bot, db, populatedDb);
+});
+// fires Mon - Thurs, at 18:00:10 (1:00 PM EST)
+//let sendFridayEmbed = new cron.CronJob('15 * 18 * * 5', test); // fires from Monday to Friday, every hour from 8 am to 16
+//. let checkTournamentBattleReactions = new cron.CronJob("00 15 * * * *", () =>
+//.   SendMessageForDuplicateVotes(GetBot(), db)
+//. );
+//. let checkTournamentBattleReactions2 = new cron.CronJob(
+//.   "00 45 * * * *",
+//.   SendMessageForDuplicateVotes(GetBot(), db)
+//. );
 
 function SetupEvents(bot) {
   const eventsPath = path.join(__dirname, "public", "events");

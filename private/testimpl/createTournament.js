@@ -30,5 +30,3 @@ module.exports = {
 		await interaction.reply(manager.get.seeding());
 	},
 };
-
-

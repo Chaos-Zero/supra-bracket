@@ -33,43 +33,9 @@ function GetAllRoundEntries(db, tournamentName, currentRound, allEntries) {
   });
 }
 
-async function GetCurrentBattle(db, tournamentName, numberOfTracks) {
-  console.log("In GetCurrentBattle");
-  var currentTournament = db.get(tournamentName).value();
-  //console.log(currentTournament);
-  sleep(500);
-  var currentRound;
-  currentTournament.every(function (round) {
-    if (round.isCurrentRound == true) {
-      console.log("Looping through rounds");
-      currentRound = round.round;
-      //console.log(currentRound);
-      return false;
-    }
-    return true;
-  });
-
-  var allEntries = [];
-  var upcomingContestants = [];
-
-  for (var i = 0; i < allEntries.length; i += parseInt(numberOfTracks)) {
-    if (allEntries[i].hasTakenPlace == false) {
-      upcomingContestants.push(allEntries[i]);
-      upcomingContestants.push(allEntries[i + 1]);
-      upcomingContestants.push(allEntries[i + 2]);
-      break;
-    }
-  }
-  console.log("Completed GetCurrentBattle");
-  return upcomingContestants;
-}
-
-function GetAllEmbedsEntries(db, tournamentName, currentRound, allEntries) {
-  var entries = db
-    .get(tournamentName)
-    .find({ round: currentRound })
-    .get("entries")
-    .value();
+function GetAllEmbedsEntries(currentTournament, currentRound, allEntries) {
+  var round = currentTournament.find((item) => item.round == currentRound);
+  var entries = round.entries;
 
   //console.log(entries);
   entries.forEach(function (entry) {
@@ -86,78 +52,90 @@ function GetAllEmbedsEntries(db, tournamentName, currentRound, allEntries) {
   });
 }
 
-async function GetNextTournamentRoundFunc(
-  db,
-  tournamentName,
+function GetNextTournamentRoundFunc(
   currentTournament,
   currentRound,
   numberOfTracks,
   todaysContestants,
-  lastContestants
+  lastContestants,
+  isFirstRound
 ) {
   var allEntries = [];
 
   //console.log(entries.length);
-  GetAllEmbedsEntries(db, tournamentName, currentRound, allEntries);
+  GetAllEmbedsEntries(currentTournament, currentRound, allEntries);
 
   //console.log(allEntries);
   //console.log ("Check this out: " + allEntries[0].name)
 
   for (var i = 0; i < allEntries.length; i += parseInt(numberOfTracks)) {
     if (allEntries[i].hasTakenPlace == false) {
-      todaysContestants.push(allEntries[i]);
-      todaysContestants.push(allEntries[i + 1]);
-      todaysContestants.push(allEntries[i + 2]);
-      if (i > 2 && lastContestants.length < 1) {
-        lastContestants.push(allEntries[i - 3]);
-        lastContestants.push(allEntries[i - 2]);
-        lastContestants.push(allEntries[i - 1]);
+      if (i == 0 && currentRound == 1) {
+        console.log("This was the first round of the tournament");
+        todaysContestants.push(allEntries[i]);
+        todaysContestants.push(allEntries[i + 1]);
+        todaysContestants.push(allEntries[i + 2]);
+        return currentRound;
+        break;
       }
-      break;
-    }
-    if (i == allEntries.length - (parseInt(numberOfTracks)) ) {
-      console.log("We should have gotten to the last entry in the list");
+      console.log("Got Here\nLast Last Contestant: " + allEntries[i - 1]);
       lastContestants.push(allEntries[i - 3]);
       lastContestants.push(allEntries[i - 2]);
       lastContestants.push(allEntries[i - 1]);
+      todaysContestants.push(allEntries[i]);
+      todaysContestants.push(allEntries[i + 1]);
+      todaysContestants.push(allEntries[i + 2]);
+      return currentRound;
+      break;
+    }
+      console.log("Current i value: " + i)
+      console.log("allEntries.length" + allEntries.length)
+    if (
+      i == (allEntries.length - parseInt(numberOfTracks)) &&
+      allEntries[i].hasTakenPlace == true
+    ) {
+      var nextRoundEntries = [];
+      currentRound = parseInt(currentRound) + 1;
+      console.log("Current round is now " + currentRound);
+      GetAllEmbedsEntries(currentTournament, currentRound, nextRoundEntries);
+
+      lastContestants.push(allEntries[i]);
+      lastContestants.push(allEntries[i + 1]);
+      lastContestants.push(allEntries[i + 2]);
+
+      console.log("Next Entry if from next round");
+      todaysContestants.push(nextRoundEntries[0]);
+      todaysContestants.push(nextRoundEntries[1]);
+      todaysContestants.push(nextRoundEntries[2]);
+      return currentRound;
+      break;
     }
   }
 }
 
-async function GetNextTournamentRound(db, tournamentName, numberOfTracks) {
-  var currentTournament = await db.get(tournamentName).value();
-  //console.log(currentTournament);
-  sleep(5000);
-  var startingRound;
-  currentTournament.every(function (round) {
-    if (round.isCurrentRound == true) {
-      startingRound = parseInt(round.round);
-      //console.log(currentRound);
-      return false;
-    }
-    return true;
-  });
-
+function GetNextTournamentRound(populatedDb, numberOfTracks, startingRound) {
   var currentRound = startingRound;
   var lastContestants = [];
   var todaysContestants = [];
 
-  do {
-    await GetNextTournamentRoundFunc(
-      db,
-      tournamentName,
-      currentTournament,
-      currentRound,
-      numberOfTracks,
-      todaysContestants,
-      lastContestants
+  currentRound = GetNextTournamentRoundFunc(
+    populatedDb,
+    currentRound,
+    numberOfTracks,
+    todaysContestants,
+    lastContestants
+  );
+  
+  console.log("Current Round is showing as: " + currentRound)
+  if (lastContestants.length < 0) {
+    console.log(
+      "Yesterday's contestants: " +
+        lastContestants.length +
+        "\nYesterday's first contestant: " +
+        lastContestants[0].name
     );
-    console.log("The ammount we have found: " + todaysContestants);
-    if (todaysContestants.length < 3) {
-      currentRound = parseInt(currentRound) + 1;
-    }
-  } while (todaysContestants.length < 3);
-  console.log("We are out of the do while");
+  }
+
   return [todaysContestants, lastContestants, currentRound, startingRound];
 }
 
@@ -186,9 +164,8 @@ async function GetCurrentRound(db, tournamentName) {
   return currentRound;
 }
 
-// Not use in production. 
-async function wasLastBattleTie(db, tournamentName, currentRound)
-{
+// Not use in production.
+async function wasLastBattleTie(db, tournamentName, currentRound) {
   return db
     .get(tournamentName)
     .find({ round: currentRound })
