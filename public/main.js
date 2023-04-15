@@ -15,6 +15,7 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const cron = require("cron");
 eval(fs.readFileSync("./public/imports.js") + "");
+eval(fs.readFileSync("./public/utils/messageutils.js") + "");
 eval(fs.readFileSync("./public/database/csv/csvfileutils.js") + "");
 
 const nodefs = require("node:fs");
@@ -35,7 +36,7 @@ let populatedDb = GetDbTable(db, process.env.TOURNAMENT_NAME);
 
 function refreshDb() {
   //db.read()
-  console.log("Db's reloaded")
+  console.log("Db's reloaded");
 }
 
 // If we want to pass this around, it needs to be in an object to pass the value by refernce, otherwise, it's just copied
@@ -81,6 +82,7 @@ function CreateBot() {
   });
   botAccess = bot;
   sendDailyEmbed.start();
+  //oneOffJoke.start();
   //checkTournamentBattleReactions.start();
   //checkTournamentBattleReactions2.start();
   return bot;
@@ -90,12 +92,18 @@ function GetBot() {
   return botAccess;
 }
 
-let sendDailyEmbed = new cron.CronJob("34 17 16 * * *", () => {
+//let sendDailyEmbed = new cron.CronJob("00 */1 * * * *", () => {
+let sendDailyEmbed = new cron.CronJob("10 25 16 * * *", () => {
   //"25 32 00 * * 1-6"
   console.log("Sending Daily Message");
-    db.read();
+  db.read();
   populatedDb = GetDbTable(db, process.env.TOURNAMENT_NAME);
   CreateAndSendDailyBattleMessages(bot, db, populatedDb);
+});
+
+let oneOffJoke = new cron.CronJob("20 18 17 * * *", () => {
+  //"25 32 00 * * 1-6"
+  CreateAprilFools();
 });
 // fires Mon - Thurs, at 18:00:10 (1:00 PM EST)
 //let sendFridayEmbed = new cron.CronJob('15 * 18 * * 5', test); // fires from Monday to Friday, every hour from 8 am to 16

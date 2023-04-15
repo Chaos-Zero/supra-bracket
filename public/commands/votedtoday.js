@@ -52,7 +52,7 @@ module.exports = {
 
 function CreateLogEmbed(round, battle) {
   const exampleEmbed = new EmbedBuilder()
-    .setColor(0x097969)
+ //   .setColor(0x097969)
     .setTitle("Round: " + round + ", Battle: " + battle + " votes!")
     .setAuthor({
       name: "Best VGM 2022",

@@ -24,7 +24,7 @@ module.exports = {
           "The Previous round has had a further 24 hours added. Thank you for your cooperation.\n" +
           "-The SupraDarky Team"
       )
-      .setColor("0xff0000");
+ //     .setColor("0xFF0000");
 
     var timeForRound = GetTimeInEpochStamp(24);
 

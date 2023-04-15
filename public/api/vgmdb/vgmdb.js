@@ -101,7 +101,7 @@ function createVGMdbEmbed(result, imgUrl, albumRange = 0) {
         "https://cdn.glitch.global/3f656222-6918-4bd9-9371-baaf3a2a9010/VGMDB-icon.png?v=1679784801996",
       url: "https://vgmdb.net/",
     })
-    .setColor(0xdc143c)
+    //.setColor(0xDC143C)
     .setURL("https://vgmdb.net/" + result.link)
     .setDescription("**Known names**: ")
     .addFields(nameFields)

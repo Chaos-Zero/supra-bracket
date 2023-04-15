@@ -5,6 +5,9 @@ function DbDefaultSetup(db) {
     {
       bestvgm2022awards: [
         {
+          receiptUsers: [],
+        },
+        {
           round: 1,
           isCurrentRound: true,
           entries: [

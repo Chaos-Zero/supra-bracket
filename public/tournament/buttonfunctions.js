@@ -1,4 +1,4 @@
-const {
+ const {
   ButtonInteraction,
   ActionRowBuilder,
   ButtonBuilder,
@@ -8,6 +8,8 @@ const fs = require("fs");
 eval(fs.readFileSync("./public/database/write.js") + "");
 
 async function handleButtonPress(interaction, db, populatedDb) {
+  const guildObject = await bot.guilds.cache.get(process.env.GUILD_ID);
+  const reportChannel = await GetChannelByName(guildObject, "sd-contest-bot");
   var foundEntry = false;
   const splitButtonName = interaction.customId.split("-");
   console.log(splitButtonName);
@@ -156,6 +158,7 @@ async function handleButtonPress(interaction, db, populatedDb) {
           ).catch(console.error);
           
           UpdateTable(db, populatedDb);
+          reportChannel.send(interaction.user.username + " changed their vote to " + splitButtonName[2])
           return 0;
         } else if (splitButtonName[1] == "remove") {
           await interaction
@@ -178,6 +181,7 @@ async function handleButtonPress(interaction, db, populatedDb) {
           removeVoteByMemberId(populatedDb, interaction.member.id);
 
           UpdateTable(db, populatedDb);
+          reportChannel.send(interaction.user.username + " reset their vote")
         } else if (splitButtonName[1] == "no") {
           await interaction.update({
             content: "Your vote has not been changed.",
@@ -197,6 +201,7 @@ async function handleButtonPress(interaction, db, populatedDb) {
           splitButtonName,
           true
         ).catch(console.error);
+        reportChannel.send(interaction.user.username + " voted for " + splitButtonName[0])
       }
 
       UpdateTable(db, populatedDb);
@@ -539,6 +544,17 @@ function RemovePreviousVotes(
 }
 
 function removeVoteByMemberId(awards, memberId) {
+  for (const award of awards) {
+    if (award.isCurrentRound) {
+      award.votedToday = award.votedToday.filter(
+        (vote) => vote.memberId !== memberId
+      );
+      break;
+    }
+  }
+}
+
+function sendReceipt(interaction, populatedDb, splitButtonName) {
   for (const award of awards) {
     if (award.isCurrentRound) {
       award.votedToday = award.votedToday.filter(

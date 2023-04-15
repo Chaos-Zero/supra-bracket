@@ -33,7 +33,8 @@ function GetAllRoundEntries(db, tournamentName, currentRound, allEntries) {
   });
 }
 
-function GetAllEmbedsEntries(currentTournament, currentRound, allEntries) {
+function GetAllEmbedsEntries(currentTournament, allEntries, currentRound) {
+  
   var round = currentTournament.find((item) => item.round == currentRound);
   var entries = round.entries;
 
@@ -52,18 +53,67 @@ function GetAllEmbedsEntries(currentTournament, currentRound, allEntries) {
   });
 }
 
+function GetPreviousTournamentRound(
+  currentTournament,
+  numberOfTracks,
+  lastContestants,
+  currentRound
+) {
+  var allEntries = [];
+
+  //console.log(entries.length);
+  GetAllEmbedsEntries(currentTournament, allEntries, currentRound);
+
+  //console.log(allEntries);
+  //console.log ("Check this out: " + allEntries[0].name)
+
+  for (var i = 0; i < allEntries.length; i += parseInt(numberOfTracks)) {
+    if (allEntries[i].hasTakenPlace == false) {
+      if (i == 0 && currentRound == 1) {
+        console.log("This was the first round of the tournament");
+        return false
+      }
+      console.log("Got Here\nLast Last Contestant: " + allEntries[i - 1]);
+      lastContestants.push(allEntries[i - 3]);
+      lastContestants.push(allEntries[i - 2]);
+      lastContestants.push(allEntries[i - 1]);
+    
+      return currentRound;
+      break;
+    }
+      console.log("Current i value: " + i)
+      console.log("allEntries.length" + allEntries.length)
+    if (
+      i == (allEntries.length - parseInt(numberOfTracks)) &&
+      allEntries[i].hasTakenPlace == true
+    ) {
+      var nextRoundEntries = [];
+      currentRound = parseInt(currentRound) + 1;
+      console.log("Current round is now " + currentRound);
+      GetAllEmbedsEntries(currentTournament, nextRoundEntries, currentRound);
+
+      lastContestants.push(allEntries[i]);
+      lastContestants.push(allEntries[i + 1]);
+      lastContestants.push(allEntries[i + 2]);
+
+      return currentRound;
+      break;
+    }
+  }
+}
+
 function GetNextTournamentRoundFunc(
   currentTournament,
   currentRound,
   numberOfTracks,
   todaysContestants,
-  lastContestants,
-  isFirstRound
+  lastContestants
+   
 ) {
   var allEntries = [];
 
   //console.log(entries.length);
-  GetAllEmbedsEntries(currentTournament, currentRound, allEntries);
+  GetAllEmbedsEntries(currentTournament, allEntries, currentRound);
 
   //console.log(allEntries);
   //console.log ("Check this out: " + allEntries[0].name)
@@ -97,7 +147,7 @@ function GetNextTournamentRoundFunc(
       var nextRoundEntries = [];
       currentRound = parseInt(currentRound) + 1;
       console.log("Current round is now " + currentRound);
-      GetAllEmbedsEntries(currentTournament, currentRound, nextRoundEntries);
+      GetAllEmbedsEntries(currentTournament, nextRoundEntries, currentRound);
 
       lastContestants.push(allEntries[i]);
       lastContestants.push(allEntries[i + 1]);
@@ -114,13 +164,12 @@ function GetNextTournamentRoundFunc(
 }
 
 function GetNextTournamentRound(populatedDb, numberOfTracks, startingRound) {
-  var currentRound = startingRound;
   var lastContestants = [];
   var todaysContestants = [];
 
-  currentRound = GetNextTournamentRoundFunc(
+  var currentRound = GetNextTournamentRoundFunc(
     populatedDb,
-    currentRound,
+    startingRound,
     numberOfTracks,
     todaysContestants,
     lastContestants

@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const Discord = require("discord.js");
 
+eval(fs.readFileSync("./public/database/read.js") + "");
 eval(fs.readFileSync("./public/main.js") + "");
 
 module.exports = {
@@ -25,10 +26,13 @@ module.exports = {
         .setRequired(false)
     ),
   async execute(interaction) {
+    var db = GetDb();
+    db.read();
+    var tournamentDb = await GetDbTable(db, process.env.TOURNAMENT_NAME);
+
     const checkingUser = interaction.user.id;
     const userToCompare = interaction.options.getString("other-member");
-    const isPublic =
-      interaction.options.getBoolean("make-public") || false;
+    const isPublic = interaction.options.getBoolean("make-public") || false;
 
     if (!userToCompare.includes("<@")) {
       return interaction.reply({
@@ -39,7 +43,6 @@ module.exports = {
     }
     var userNumb = userToCompare.match(/\d/g);
     var userId = userNumb.join("").trim();
-    console.log(userId);
 
     //await interaction.reply({
     //  content: "Testing in the backend",
@@ -47,7 +50,7 @@ module.exports = {
 
     var userResults = compareUsers(
       interaction,
-      GetLocalDb(),
+      tournamentDb,
       checkingUser,
       userId
     );
@@ -111,11 +114,10 @@ function compareUsers(interaction, awards, userId1, userId2) {
     console.log("How many entries have we found?: " + award.entries.length);
     for (const entry of award.entries) {
       if (
-        entry.usersFirstPick.length === 0 ||
-        entry.usersSecondPick.length === 0 ||
+        entry.usersFirstPick.length === 0 &&
+        entry.usersSecondPick.length === 0 &&
         entry.usersDidNotPlace.length === 0
       ) {
-        console.log("We didn't find anything on this one");
         continue;
       }
 
@@ -170,7 +172,7 @@ function compareUsers(interaction, awards, userId1, userId2) {
         user1InFirstPickAndUser2InSecondPick ||
         user1InSecondPickAndUser2InFirstPick
       ) {
-        totalWeight += 1;
+        totalWeight += 0.5;
       }
 
       if (
@@ -180,15 +182,17 @@ function compareUsers(interaction, awards, userId1, userId2) {
         totalWeight -= 0.5;
         oneInFirstPickOtherInDidNotPlaceCount++;
       }
-      if (
-        bothInFirstPick ||
-        bothInSecondPick ||
-        bothInThirdPick ||
-        user1InFirstPickAndUser2InSecondPick ||
-        user1InSecondPickAndUser2InFirstPick ||
-        user1InFirstPickAndUser2InDidNotPlace ||
-        user1InDidNotPlaceAndUser2InFirstPick
-      ) {
+
+      var user1InBattle =
+        entry.usersFirstPick.includes(userId1) ||
+        entry.usersSecondPick.includes(userId1) ||
+        entry.usersDidNotPlace.includes(userId1);
+      var user2InBattle =
+        entry.usersFirstPick.includes(userId2) ||
+        entry.usersSecondPick.includes(userId2) ||
+        entry.usersDidNotPlace.includes(userId2);
+      
+      if (user1InBattle && user2InBattle) {
         maxWeight += 2;
         iterations++;
       }
@@ -292,7 +296,7 @@ function CreateDiscordEmbed(
           inline: false,
         }
       )
-      .setColor(colour)
+ //     .setColor(colour)
       .setFooter({
         text: "Supradarky's VGM Club",
         iconURL:

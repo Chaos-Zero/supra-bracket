@@ -9,6 +9,7 @@ eval(fs.readFileSync("./public/imageprocessing/imagebuilder.js") + "");
 eval(fs.readFileSync("./public/imageprocessing/gifcreator.js") + "");
 eval(fs.readFileSync("./public/database/read.js") + "");
 eval(fs.readFileSync("./public/database/write.js") + "");
+eval(fs.readFileSync("./public/tournament/tournamentutils.js") + "");
 
 async function ReturnReactionTotals(bot, interaction) {
   // Would pass in tournament name from this slash command in the future
@@ -262,7 +263,7 @@ async function SendDailyEmbed(
        usersDidNotPlace: [],
      }
  */
-  SendUpdateToLogs(guild, db);
+  //SendUpdateToLogs(guild, db);
   const channel = await GetChannelByName(guild, process.env.TOURNAMENT_CHANNEL);
   var links = [];
   let imgName = "";
@@ -403,34 +404,17 @@ async function SendDailyEmbed(
             inline: true,
           }
         )
-        .setColor("0xffffff")
+        .setColor(0xffffff)
 
         .setDescription(
           "**Points: " + sortedPreviousDaysEntries[0].points + "**"
         )
         .setImage(previousWinnerPath);
-      //.setFooter({
-      //  text:
-      //    "2nd Place: " +
-      //    sortedPreviousDaysEntries[1].name +
-      //    " | Points: " +
-      //    sortedPreviousDaysEntries[1].points +
-      //    "\n3rd Place: " +
-      //    sortedPreviousDaysEntries[2].name +
-      //    " | Points: " +
-      //    sortedPreviousDaysEntries[2].points,
-      //});
     }
 
     const gifPath =
       "https://sd-dev-bot.glitch.me/commands/gif/output/" + gifName + ".gif";
 
-    // var title =
-    //   "*Previous Battle Results*:\n**1st place: " +
-    //   tournamentRoundDetails[1][parseInt(previousWinner)].name +
-    //   " - " +
-    //   Object.values(previousDaysPoints[0])[0] +
-    //   " points\n2nd place Blah points\n3rd place blash points\n";
     const d = new Date();
     let day = d.getDay();
 
@@ -450,13 +434,9 @@ async function SendDailyEmbed(
         iconURL:
           "https://cdn.glitch.global/485febab-53bf-46f2-9ec1-a3c597dfaebe/SD%20Logo.png?v=1676855711752",
       })
-      .setColor("0xffff00")
-      //.setDescription(
-      //"\n**TODAY'S BATTLE:** Vote by tomorrow, 1:00 PM EST, in x hours"
-      //)
+      .setColor(0xffff00)
       .addFields(
         {
-          //name: "\u200B",
           name:
             "**TODAY'S BATTLE:** Voting for this battle ends <t:" +
             timeUntilNextRound +
@@ -484,39 +464,8 @@ async function SendDailyEmbed(
           value: `After having listened to all tracks, vote for your ranked order of preference.`, //` by reacting to this post:`,
           //value: `Ranked Order for voting purposes:`,
         }
-        //{
-        //  name: `...1️⃣...`,
-        //  value: `A>B>C`,
-        //  inline: true,
-        //},
-        //{
-        //  name: `...2️⃣...`,
-        //  value: `A>C>B     `,
-        //  inline: true,
-        //},
-        //{
-        //  name: `...3️⃣...`,
-        //  value: `B>A>C `,
-        //  inline: true,
-        //},
-        //{
-        //  name: `...4️⃣...`,
-        //  value: `B>C>A`,
-        //  inline: true,
-        //},
-        //{
-        //  name: `...5️⃣...`,
-        //  value: `C>A>B`,
-        //  inline: true,
-        //},
-        //{
-        //  name: `...6️⃣...`,
-        //  value: `C>B>A`,
-        //  inline: true,
-        //}
       )
-      //  .setTitle(`${title1}`)
-      //.setDescription("Blah blah")
+
       .setThumbnail(
         gifPath
         //"https://cdn.glitch.global/485febab-53bf-46f2-9ec1-a3c597dfaebe/sd-img.jpeg?v=1676586931016"
@@ -524,11 +473,7 @@ async function SendDailyEmbed(
 
     var embedsToSend =
       sortedPreviousDaysEntries.length > 0 ? [prevEmbed, embed] : [embed];
-    //channel.send({
-    //  content: "Hello all and <@&1077345571221807244>",
-    //  components: [row],
-    //});
-    //RemoveBotReactions(previousMessage);
+
     channel
       .send({
         content: "Hello all and <@&1077345571221807244>",
@@ -591,13 +536,6 @@ async function SendDailyEmbed(
         embedMessage.edit({
           components: [aButtonVotes, bButtonVotes, cButtonVotes],
         });
-
-        //  embedMessage.react("1️⃣");
-        //  embedMessage.react("2️⃣");
-        //  embedMessage.react("3️⃣");
-        //  embedMessage.react("4️⃣");
-        //  embedMessage.react("5️⃣");
-        //  embedMessage.react("6️⃣");
       });
 
     console.log(
@@ -621,6 +559,15 @@ async function SendDailyEmbed(
       UpdateRoundCompleted(populatedDb, tournamentRoundDetails[3]);
     }
     UpdateTable(db, populatedDb);
+
+
+    if (sortedPreviousDaysEntries.length > 0) {
+      CreateAndSendBattleVotesEmbed(
+        tournamentRoundDetails[3],
+        parseInt(tournamentRoundDetails[1][0].battle),
+        true
+      );
+    }
   });
 }
 
@@ -661,7 +608,10 @@ async function CreateAndSendDailyBattleMessages(
     tournamentRoundDetails[0][2].link,
   ];
   let gifName =
-    "round" + currentRound + "battle" + tournamentRoundDetails[0][0].battle;
+    "round" +
+    tournamentRoundDetails[2] +
+    "battle" +
+    tournamentRoundDetails[0][0].battle;
   downloadImages(youtubeUrls).then(async () => {
     // Discord caches images so we have to change the name each day
     // Just going to use the date
@@ -871,10 +821,7 @@ function moveFiles(sourceFolderPath, targetFolderPath) {
 }
 
 async function SendUpdateToLogs(guild, db) {
-  var channel = await GetChannelByName(
-    guild,
-    "majordomo-logs"
-  );
+  var channel = await GetChannelByName(guild, "majordomo-logs");
   db.read();
   var votedTodayCollection = "";
 

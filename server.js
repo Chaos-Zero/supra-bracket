@@ -5,7 +5,7 @@
 // but feel free to use whatever libraries or frameworks you'd like through `package.json`.
 const express = require("express");
 const fs = require("fs");
-const { Events } = require("discord.js");
+const { Events, EmbedBuilder } = require("discord.js");
 const cron = require("cron");
 
 eval(fs.readFileSync("./public/main.js") + "");
@@ -63,6 +63,10 @@ bot.on("messageCreate", async (message) => {
 //  }
 //});
 
+const throwEmbed = new EmbedBuilder().setImage(
+  "https://cdn.glitch.global/3f656222-6918-4bd9-9371-baaf3a2a9010/domo-stuffed-animal.gif?v=1680306555071"
+);
+
 // make all the files in 'public' available
 // https://expressjs.com/en/starter/static-files.html
 app.use(express.static("public"));
@@ -113,7 +117,17 @@ bot.on(Events.InteractionCreate, (interaction) => {
       console.log("the split buttoncvxcv" + splitButtonName);
       if (splitButtonName[0] == "album") {
         await handleVgmdbButtonPress(interaction);
-      } else {
+      } else if (splitButtonName[0] == 'fool'){
+         (async () => {
+        await interaction.reply({
+          content:
+            "IT'S APRIL FOOLS'.\n GET OUTTA HERE!",
+          embeds: [throwEmbed],
+          ephemeral: true,
+        });
+      })().catch(console.error);
+      } 
+      else {
         await handleButtonPress(interaction, db, populatedDb);
       }
     })().catch(console.error);
